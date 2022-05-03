@@ -31,7 +31,7 @@ def getEntries(dict, search_date):
     return day
 
 def colourOutput(r, g, b, text):
-    return "\033[38;2;{};{};{}m{} \033[38;2;200;200;200m".format(r, g, b, text)
+    return "\033[38;2;{};{};{}m{}\033[38;2;200;200;200m".format(r, g, b, text)
 
 #######################
 
@@ -60,14 +60,15 @@ with open(file_handle, "r+", encoding='utf-8') as journal_file:
         mapped = {}
         addSeparator()
         for index, question in enumerate(journal['questions']):
-            print(f"[{index + 1}] {journal['questions'][question]['text']}")
+            index_text = f"[{index + 1}]"
+            print(f"{colourOutput(255,255,255, index_text)} {journal['questions'][question]['text']}")
             mapped[index + 1] = journal['questions'][question]['id']
         choice = 0
         while choice == 0:
             try:
-                choice = input("[#] Svara, [v] Visa, [n] Skapa, [q] Avsluta: ")
+                choice = input(f"{colourOutput(255,255,255,'[#]')} Svara {colourOutput(255,255,255,'[v]')} Visa {colourOutput(255,255,255,'[n]')} Skapa {colourOutput(255,255,255,'[Q]')} Avsluta: ")
                 addSeparator()
-                if choice.lower() == "q":
+                if choice.lower() == "q" or choice== "":
                     choice = 2000
                 elif choice.lower() == "n":
                     choice = 3000
@@ -77,7 +78,7 @@ with open(file_handle, "r+", encoding='utf-8') as journal_file:
             except ValueError:
                 print(colourOutput(255, 0, 0, "Felaktigt input, försök igen."))
         if choice in mapped:
-            print(f"{journal['questions'][mapped[choice]]['text']} [enter]")
+            print(f"{journal['questions'][mapped[choice]]['text']} {colourOutput(255,255,255, '[enter]')}")
             entry = input()
             today = datetime.date.strftime(datetime.date.today(), '%Y%m%d')
             id = f"{today}-{mapped[choice]}"
@@ -88,7 +89,8 @@ with open(file_handle, "r+", encoding='utf-8') as journal_file:
         elif choice == 2000:
             break
         elif choice == 3000:
-            text = input("Ny fråga, [enter]: ")
+            print(f"Lägg till fråga {colourOutput(255,255,255, '[enter]')} ")
+            text = input()
             if len(text) > 0:
                 if not text.endswith("?"):
                     text += "?"	
@@ -102,9 +104,9 @@ with open(file_handle, "r+", encoding='utf-8') as journal_file:
                     date = date - datetime.timedelta(days=1)
                 elif page == ">":
                     date = date + datetime.timedelta(days=1)
-                elif page == "t":
+                elif page.lower() == "t" or page == "":
                     break
-                elif page == "n":
+                elif page.lower() == "n":
                     date = datetime.date.today()
                 else:
                     try:
@@ -117,6 +119,7 @@ with open(file_handle, "r+", encoding='utf-8') as journal_file:
                 for entry in data['entries']:
                     print(colourOutput(255,255,255, entry['question']))
                     print('\n'.join(textwrap.wrap(entry['answer'], 80, break_long_words=False)))
-                page = input(f"[< >], [yyyymmdd], [n] nu, [t] tillbaka: ")
+                page = input(f"{colourOutput(255,255,255,'[< >]')} {colourOutput(255,255,255, '[yyyymmdd]')} {colourOutput(255,255,255, '[n]')} nu {colourOutput(255,255,255, '[T]')} tillbaka: ")
+
 with open(file_handle, "w", encoding='utf-8') as journal_file:
     json.dump(journal, journal_file, ensure_ascii=False)
