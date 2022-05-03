@@ -1,8 +1,10 @@
 from datetime import datetime
+from pathlib import Path
 import json
 import hashlib
 import datetime
 import textwrap
+import os
 
 def addQuestion(text, object):
     hash = hashlib.md5(text.encode('utf-8')).hexdigest()
@@ -45,16 +47,21 @@ journal_base = {
 }
 
 file_handle = 'journal.json'
-
+file_dir = '.journal'
+file_home = str(Path.home())
+file_path = file_home + '/' + file_dir + '/' + file_handle
 
 try:
-    with open(file_handle, "r", encoding='utf-8') as journal_file:
+    with open(file_path, "r", encoding='utf-8') as journal_file:
         print(colourOutput(0,0,0, ""))
 except FileNotFoundError:
-    with open(file_handle, "w+", encoding='utf-8') as journal_file:
+    print(file_path)
+    path = os.path.join(file_home, file_dir )
+    os.makedirs(path, exist_ok=True)
+    with open(file_path, "w+", encoding='utf-8') as journal_file:
         json.dump(journal_base, journal_file, ensure_ascii=False)
 
-with open(file_handle, "r+", encoding='utf-8') as journal_file:
+with open(file_path, "r+", encoding='utf-8') as journal_file:
     journal = json.load(journal_file)
     while True:
         mapped = {}
@@ -119,7 +126,9 @@ with open(file_handle, "r+", encoding='utf-8') as journal_file:
                 for entry in data['entries']:
                     print(colourOutput(255,255,255, entry['question']))
                     print('\n'.join(textwrap.wrap(entry['answer'], 80, break_long_words=False)))
+                if len(data['entries']):
+                    addSeparator()
                 page = input(f"{colourOutput(255,255,255,'[< >]')} {colourOutput(255,255,255, '[yyyymmdd]')} {colourOutput(255,255,255, '[n]')} nu {colourOutput(255,255,255, '[T]')} tillbaka: ")
 
-with open(file_handle, "w", encoding='utf-8') as journal_file:
+with open(file_path, "w", encoding='utf-8') as journal_file:
     json.dump(journal, journal_file, ensure_ascii=False)
