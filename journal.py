@@ -79,8 +79,11 @@ with open(file_path, "r+", encoding='utf-8') as journal_file:
         choice = 0
         while choice == 0:
             try:
-                choice = input(
-                    f"{colourOutput(255, 255, 255, '[#]')} Svara {colourOutput(255, 255, 255, '[v]')} Visa {colourOutput(255, 255, 255, '[n]')} Skapa {colourOutput(255, 255, 255, '[Q]')} Avsluta: ")
+                choice = input((
+                    f"{colourOutput(255, 255, 255, '[#]')} Svara "
+                    f"{colourOutput(255, 255, 255, '[v]')} Visa "
+                    f"{colourOutput(255, 255, 255, '[n]')} Skapa "
+                    f"{colourOutput(255, 255, 255, '[Q]')} Avsluta: "))
                 addSeparator()
                 if choice.lower() == "q" or choice == "":
                     choice = 2000
@@ -92,8 +95,9 @@ with open(file_path, "r+", encoding='utf-8') as journal_file:
             except ValueError:
                 print(colourOutput(255, 0, 0, "Felaktigt input, försök igen."))
         if choice in mapped:
-            print(
-                f"{journal['questions'][mapped[choice]]['text']} {colourOutput(255,255,255, '[enter]')}")
+            print((
+                f"{journal['questions'][mapped[choice]]['text']} "
+                f"{colourOutput(255,255,255, '[enter]')}"))
             entry = input()
             today = datetime.date.strftime(datetime.date.today(), '%Y%m%d')
             id = f"{today}-{mapped[choice]}"
@@ -138,8 +142,11 @@ with open(file_path, "r+", encoding='utf-8') as journal_file:
                         entry['answer'], 80, break_long_words=False)))
                 if len(data['entries']):
                     addSeparator()
-                page = input(
-                    f"{colourOutput(255,255,255,'[< >]')} {colourOutput(255,255,255, '[yyyymmdd]')} {colourOutput(255,255,255, '[n]')} nu {colourOutput(255,255,255, '[T]')} tillbaka: ")
+                page = input((
+                    f"{colourOutput(255,255,255,'[< >]')} "
+                    f"{colourOutput(255,255,255, '[yyyymmdd]')} "
+                    f"{colourOutput(255,255,255, '[n]')} nu "
+                    f"{colourOutput(255,255,255, '[T]')} tillbaka: "))
 
 with open(file_path, "w", encoding='utf-8') as journal_file:
     json.dump(journal, journal_file, ensure_ascii=False)
