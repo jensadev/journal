@@ -6,6 +6,7 @@ import datetime
 import textwrap
 import os
 
+
 def addQuestion(text, object):
     hash = hashlib.md5(text.encode('utf-8')).hexdigest()
     today = datetime.date.strftime(datetime.date.today(), '%Y%m%d')
@@ -15,8 +16,10 @@ def addQuestion(text, object):
         "createdAt": today
     }
 
+
 def addSeparator():
-    print(colourOutput(50,50,50, "-" * 80))
+    print(colourOutput(50, 50, 50, "-" * 80))
+
 
 def getEntries(dict, search_date):
     day = {
@@ -32,10 +35,12 @@ def getEntries(dict, search_date):
             })
     return day
 
+
 def colourOutput(r, g, b, text):
     return "\033[38;2;{};{};{}m{}\033[38;2;200;200;200m".format(r, g, b, text)
 
 #######################
+
 
 questions = {}
 addQuestion("Vad ska du göra idag?", questions)
@@ -53,10 +58,10 @@ file_path = file_home + '/' + file_dir + '/' + file_handle
 
 try:
     with open(file_path, "r", encoding='utf-8') as journal_file:
-        print(colourOutput(0,0,0, ""))
+        print(colourOutput(0, 0, 0, ""))
 except FileNotFoundError:
     print(file_path)
-    path = os.path.join(file_home, file_dir )
+    path = os.path.join(file_home, file_dir)
     os.makedirs(path, exist_ok=True)
     with open(file_path, "w+", encoding='utf-8') as journal_file:
         json.dump(journal_base, journal_file, ensure_ascii=False)
@@ -79,7 +84,7 @@ with open(file_path, "r+", encoding='utf-8') as journal_file:
                     Visa {colourOutput(255,255,255,'[n]')} \
                     Skapa {colourOutput(255,255,255,'[Q]')} Avsluta: ")
                 addSeparator()
-                if choice.lower() == "q" or choice== "":
+                if choice.lower() == "q" or choice == "":
                     choice = 2000
                 elif choice.lower() == "n":
                     choice = 3000
@@ -105,7 +110,7 @@ with open(file_path, "r+", encoding='utf-8') as journal_file:
             text = input()
             if len(text) > 0:
                 if not text.endswith("?"):
-                    text += "?"	
+                    text += "?"
                 addQuestion(text, journal['questions'])
                 print(colourOutput(0, 255, 0, "Frågan sparad"))
         elif choice == 4000:
@@ -124,13 +129,15 @@ with open(file_path, "r+", encoding='utf-8') as journal_file:
                     try:
                         date = datetime.datetime.strptime(page, '%Y%m%d')
                     except ValueError:
-                        print(colourOutput(255, 0, 0, "Felaktigt datum, försök igen."))
+                        print(colourOutput(
+                            255, 0, 0, "Felaktigt datum, försök igen."))
                 data = getEntries(journal['entries'], date)
                 print(f"{data['date'].strftime('%A %d %B %Y')}")
                 addSeparator()
                 for entry in data['entries']:
-                    print(colourOutput(255,255,255, entry['question']))
-                    print('\n'.join(textwrap.wrap(entry['answer'], 80, break_long_words=False)))
+                    print(colourOutput(255, 255, 255, entry['question']))
+                    print('\n'.join(textwrap.wrap(
+                        entry['answer'], 80, break_long_words=False)))
                 if len(data['entries']):
                     addSeparator()
                 page = input(f"{colourOutput(255,255,255,'[< >]')} \
