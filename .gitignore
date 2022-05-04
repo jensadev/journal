@@ -2,3 +2,4 @@ journal.json
 build/
 dist/
 program.spec
+journal.spec
