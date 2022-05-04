@@ -39,6 +39,27 @@ def getEntries(dict, search_date):
 def colourOutput(r, g, b, text):
     return "\033[38;2;{};{};{}m{}\033[38;2;200;200;200m".format(r, g, b, text)
 
+
+def getMainChoice():
+    choice = 0
+    while True:
+        try:
+            choice = input((
+                f"{colourOutput(255, 255, 255, '[#]')} Svara "
+                f"{colourOutput(255, 255, 255, '[v]')} Visa "
+                f"{colourOutput(255, 255, 255, '[n]')} Skapa "
+                f"{colourOutput(255, 255, 255, '[enter]')} Avsluta: "))
+            addSeparator()
+            if choice == "":
+                choice = 2000
+            elif choice.lower() == "n":
+                choice = 3000
+            elif choice.lower() == "v":
+                choice = 4000
+            return int(choice)
+        except ValueError:
+            print(colourOutput(255, 0, 0, "Felaktigt input, försök igen."))
+
 #######################
 
 
@@ -76,31 +97,16 @@ with open(file_path, "r+", encoding='utf-8') as journal_file:
             print(
                 f"{colourOutput(255,255,255, index_text)} {journal['questions'][question]['text']}")
             mapped[index + 1] = journal['questions'][question]['id']
-        choice = 0
-        while choice == 0:
-            try:
-                choice = input((
-                    f"{colourOutput(255, 255, 255, '[#]')} Svara "
-                    f"{colourOutput(255, 255, 255, '[v]')} Visa "
-                    f"{colourOutput(255, 255, 255, '[n]')} Skapa "
-                    f"{colourOutput(255, 255, 255, '[Q]')} Avsluta: "))
-                addSeparator()
-                if choice.lower() == "q" or choice == "":
-                    choice = 2000
-                elif choice.lower() == "n":
-                    choice = 3000
-                elif choice.lower() == "v":
-                    choice = 4000
-                choice = int(choice)
-            except ValueError:
-                print(colourOutput(255, 0, 0, "Felaktigt input, försök igen."))
+        choice = getMainChoice()
         if choice in mapped:
             print((
                 f"{journal['questions'][mapped[choice]]['text']} "
                 f"{colourOutput(255,255,255, '[enter]')}"))
-            entry = input()
             today = datetime.date.strftime(datetime.date.today(), '%Y%m%d')
             id = f"{today}-{mapped[choice]}"
+            if id in journal['entries']:
+                print(f"{colourOutput(100, 100, 100, journal['entries'][id])}")
+            entry = input()
             if id not in journal['entries']:
                 journal['entries'][id] = entry
             else:
@@ -116,16 +122,16 @@ with open(file_path, "r+", encoding='utf-8') as journal_file:
                 addQuestion(text, journal['questions'])
                 print(colourOutput(0, 255, 0, "Frågan sparad"))
         elif choice == 4000:
-            page = "n"
+            page = "i"
             date = datetime.date.today()
             while True:
                 if page == "<":
                     date = date - datetime.timedelta(days=1)
                 elif page == ">":
                     date = date + datetime.timedelta(days=1)
-                elif page.lower() == "t" or page == "":
+                elif page == "":
                     break
-                elif page.lower() == "n":
+                elif page.lower() == "i":
                     date = datetime.date.today()
                 else:
                     try:
@@ -145,8 +151,8 @@ with open(file_path, "r+", encoding='utf-8') as journal_file:
                 page = input((
                     f"{colourOutput(255,255,255,'[< >]')} "
                     f"{colourOutput(255,255,255, '[yyyymmdd]')} "
-                    f"{colourOutput(255,255,255, '[n]')} nu "
-                    f"{colourOutput(255,255,255, '[T]')} tillbaka: "))
+                    f"{colourOutput(255,255,255, '[i]')} Idag "
+                    f"{colourOutput(255,255,255, '[enter]')} Tillbaka: "))
 
 with open(file_path, "w", encoding='utf-8') as journal_file:
     json.dump(journal, journal_file, ensure_ascii=False)
