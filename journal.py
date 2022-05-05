@@ -50,7 +50,6 @@ def getMainChoice():
                    f"{colored('[enter]', 'white', attrs=['bold'])}" +
                    " Avsluta"))
             choice = input(prompt)
-            printSeparator()
             if choice == "":
                 choice = 2000
             elif choice.lower() == "n":
@@ -80,12 +79,12 @@ journal_base = {
     "favourites": []
 }
 
-prompt = colored("❯ ", 'green', attrs=['bold', 'blink'])
+prompt = colored(": ", 'white', attrs=['bold'])
 
 file_handle = 'journal'
 file_dir = '.journal'
 file_home = str(Path.home())
-file_path = file_home + '/' + file_dir + '/' + file_handle
+file_path = str(os.path.join(file_home, file_dir, file_handle))
 file_json = file_path + '.json'
 file_temp = file_path + '.tmp'
 file_err = file_path + '.err'
@@ -103,7 +102,7 @@ except FileNotFoundError:
     with open(file_json, "w+", encoding='utf-8') as journal_file:
         print(
             f"\nSkapar journal {colored(file_json, 'cyan', attrs=['underline'])}")
-        json.dump(journal_base, file_json, ensure_ascii=False)
+        json.dump(journal_base, journal_file, ensure_ascii=False)
         journal = journal_base
 except json.decoder.JSONDecodeError as err:
     print(
@@ -132,14 +131,14 @@ while True:
         mapped[index + 1] = journal['questions'][question]['id']
     choice = getMainChoice()
     if choice in mapped:
-        print(f"{journal['questions'][mapped[choice]]['text']} " +
+        print(f"{colored(journal['questions'][mapped[choice]]['text'], 'magenta')} " +
                 colored("[enter]", 'white', attrs=['bold']))
         today = datetime.date.strftime(datetime.date.today(), '%Y%m%d')
         id = f"{today}-{mapped[choice]}"
         if id in journal['entries']:
             cprint('\n'.join(textwrap.wrap(
                 journal['entries'][id], 80, break_long_words=False)), 'white', attrs=['dark'])
-        entry = input(prompt)
+        entry = input()
         if id not in journal['entries']:
             journal['entries'][id] = entry
         else:
@@ -149,7 +148,7 @@ while True:
     elif choice == 3000:
         print((f"{colored('[enter]', 'white', attrs=['bold'])} " +
                 f"{colored('Ny fråga', 'magenta')}"))
-        text = input(prompt)
+        text = input()
         if len(text) > 0:
             if not text.endswith("?"):
                 text += "?"
@@ -163,9 +162,13 @@ while True:
             elif page == ">":
                 date = date + datetime.timedelta(days=1)
             elif page == "*":
-                journal['favourites'].append(
-                    datetime.date.strftime(date, '%Y%m%d'))
-                journal['favourites']
+                date_string = datetime.date.strftime(date, '%Y%m%d')
+                if not date_string in journal['favourites']:
+                    journal['favourites'].append(date_string)
+                    cprint("+", 'green', attrs=['bold'])
+                else:
+                    journal['favourites'].remove(date_string)
+                    cprint("-", 'red', attrs=['bold'])
             elif page == "":
                 break
             elif page.lower() == "i":
@@ -196,18 +199,22 @@ while True:
                     f"{colored('[enter]', 'white', attrs=['bold'])} " +
                     "Avsluta"))
             page = input(prompt)
-            printSeparator()
+
+file_check = False
 
 with open(file_temp, "w", encoding='utf-8') as temp_file:
     try:
         json.dump(journal, temp_file, ensure_ascii=False)
-        with open(file_json, "w", encoding='utf-8') as journal_file:
-            json.dump(journal, journal_file, ensure_ascii=False)
-            os.remove(file_temp)
-        print(
-            f"Journal sparad {colored(file_path, 'cyan', attrs=['underline'])}")
+        file_check = True
     except Exception as err:
         print(
             f"Kunde inte spara {colored(file_json, 'cyan', attrs=['underline'])}")
         saveError(err, file_err)
         sys.exit(1)
+
+if file_check:
+    os.remove(file_temp)
+    with open(file_json, "w", encoding='utf-8') as journal_file:
+        json.dump(journal, journal_file, ensure_ascii=False)
+    print(
+        f"Journal sparad {colored(file_json, 'cyan', attrs=['underline'])}")
