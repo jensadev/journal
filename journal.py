@@ -1,14 +1,17 @@
 import sys
 from pathlib import Path
 from termcolor import colored, cprint
-from colorama import init, Style, Fore
+import colorama
 import json
 import hashlib
 import datetime
 import textwrap
 import os
-init(autoreset=True)
+colorama.init(autoreset=True)
 
+def input_colorama(message) :
+    print(message, end = '')
+    return input()
 
 def addQuestion(text, object):
     hash = hashlib.md5(text.encode('utf-8')).hexdigest()
@@ -49,7 +52,7 @@ def getMainChoice():
                    " Ny fråga " +
                    f"{colored('[enter]', 'white', attrs=['bold'])}" +
                    " Avsluta"))
-            choice = input(prompt)
+            choice = input_colorama(prompt)
             if choice == "":
                 choice = 2000
             elif choice.lower() == "n":
@@ -198,7 +201,8 @@ while True:
                     "Favorit " +
                     f"{colored('[enter]', 'white', attrs=['bold'])} " +
                     "Avsluta"))
-            page = input(prompt)
+            # page = input(prompt)
+            page = input_colorama(prompt)
 
 file_check = False
 
