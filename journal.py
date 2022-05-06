@@ -7,11 +7,14 @@ import hashlib
 import datetime
 import textwrap
 import os
+import time
 colorama.init(autoreset=True)
 
-def input_colorama(message) :
-    print(message, end = '')
+
+def input_colorama(message):
+    print(message, end='')
     return input()
+
 
 def addQuestion(text, object):
     hash = hashlib.md5(text.encode('utf-8')).hexdigest()
@@ -27,18 +30,34 @@ def printSeparator():
     cprint("-" * 80, 'yellow')
 
 
+def clearScreen():
+    print("\033c")
+
+
+def newScreen(heading = False):
+    clearScreen()
+    if heading:
+        print(" " + heading)
+    printSeparator()
+
+
 def getEntries(dict, search_date):
+    string_date = datetime.date.strftime(search_date, '%Y%m%d')
     day = {
         "date": search_date,
+        "favourite": string_date in journal['favourites'],
         "entries": []
     }
-    string_date = datetime.date.strftime(search_date, '%Y%m%d')
     for entry in dict:
-        if entry.startswith(string_date):
-            day['entries'].append({
-                "question": journal['questions'][entry.split('-')[1]]['text'],
-                "answer": dict[entry]
-            })
+        # handle removed questions
+        try:
+            if entry.startswith(string_date):
+                day['entries'].append({
+                    "question": journal['questions'][entry.split('-')[1]]['text'],
+                    "answer": dict[entry]
+                })
+        except KeyError:
+            pass
     return day
 
 
@@ -46,18 +65,18 @@ def getMainChoice():
     choice = 0
     while True:
         try:
-            print((f"{colored('[v]', 'white', attrs=['bold'])}" +
-                   " Visa " +
-                   f"{colored('[n]', 'white', attrs=['bold'])}" +
-                   " Ny fråga " +
+            print((f"{colored('[h]', 'white', attrs=['bold'])}" +
+                   " Historik " +
+                   f"{colored('[r]', 'white', attrs=['bold'])}" +
+                   " Redigera frågor " +
                    f"{colored('[enter]', 'white', attrs=['bold'])}" +
                    " Avsluta"))
             choice = input_colorama(prompt)
             if choice == "":
                 choice = 2000
-            elif choice.lower() == "n":
+            elif choice.lower() == "r":
                 choice = 3000
-            elif choice.lower() == "v":
+            elif choice.lower() == "h":
                 choice = 4000
             return int(choice)
         except ValueError:
@@ -97,45 +116,51 @@ journal = False
 try:
     with open(file_json, "r", encoding='utf-8') as journal_file:
         journal = json.load(journal_file)
-        print(
-            f"\nLaddar in journal från {colored(file_json , 'cyan', attrs=['underline'])}")
+        heading = f"\nLaddar in journal från {colored(file_json , 'cyan', attrs=['underline'])}"
+        newScreen(heading)
 except FileNotFoundError:
     path = os.path.join(file_home, file_dir)
     os.makedirs(path, exist_ok=True)
     with open(file_json, "w+", encoding='utf-8') as journal_file:
-        print(
-            f"\nSkapar journal {colored(file_json, 'cyan', attrs=['underline'])}")
         json.dump(journal_base, journal_file, ensure_ascii=False)
         journal = journal_base
+        heading = f"\nSkapar journal {colored(file_json, 'cyan', attrs=['underline'])}"
+        newScreen(heading)
 except json.decoder.JSONDecodeError as err:
-    print(
-        f"\nFelaktigt format i journalfilen {colored(file_json , 'cyan', attrs=['underline'])}")
+    heading = f"\nFelaktigt format i journalfilen {colored(file_json , 'cyan', attrs=['underline'])}"
+    newScreen(heading)
+    cprint("Avslutar", 'red', attrs=['bold'])
     saveError(err, file_err)
     sys.exit(1)
 except PermissionError as err:
-    print(
-        f"\nKan inte läsa/skriva till journal {colored(file_json, 'cyan', attrs=['underline'])}")
+    heading = f"\nKan inte läsa/skriva till journal {colored(file_json, 'cyan', attrs=['underline'])}"
+    newScreen(heading)
+    cprint("Avslutar", 'red', attrs=['bold'])
     saveError(err, file_err)
     sys.exit(1)
 except Exception as err:
-    print(
-        f"\nOkänt fel i journal {colored(file_json, 'cyan', attrs=['underline'])}")
+    heading = f"\nOkänt fel i journal {colored(file_json, 'cyan', attrs=['underline'])}"
+    newScreen(heading)
+    cprint("Avslutar", 'red', attrs=['bold'])
     saveError(err, file_err)
     sys.exit(1)
 
 
 while True:
+    time.sleep(0.3)
+    heading = colored("Journal", 'yellow', attrs=['bold'])
+    newScreen(heading)
     mapped = {}
-    printSeparator()
     for index, question in enumerate(journal['questions']):
         index_text = f"[{index + 1}] "
         print((f"{colored(index_text, 'white', attrs=['bold'])}" +
-                f"{colored(journal['questions'][question]['text'], 'magenta')}"))
+               f"{colored(journal['questions'][question]['text'], 'magenta')}"))
         mapped[index + 1] = journal['questions'][question]['id']
     choice = getMainChoice()
     if choice in mapped:
+        newScreen(colored("Svara", 'yellow', attrs=['bold']))
         print(f"{colored(journal['questions'][mapped[choice]]['text'], 'magenta')} " +
-                colored("[enter]", 'white', attrs=['bold']))
+              colored("[enter]", 'white', attrs=['bold']))
         today = datetime.date.strftime(datetime.date.today(), '%Y%m%d')
         id = f"{today}-{mapped[choice]}"
         if id in journal['entries']:
@@ -149,13 +174,29 @@ while True:
     elif choice == 2000:
         break
     elif choice == 3000:
-        print((f"{colored('[enter]', 'white', attrs=['bold'])} " +
-                f"{colored('Ny fråga', 'magenta')}"))
+        heading = colored("Redigera", 'yellow', attrs=['bold'])
+        newScreen(heading)
+        print((f"{colored('[enter]', 'white', attrs=['bold'])}" +
+            " Skriv ny " +
+               f"{colored('fråga', 'magenta')}" +
+               " eller en existerande " +
+               f"{colored('fråga', 'magenta')}" +
+               " för att radera"))
         text = input()
         if len(text) > 0:
             if not text.endswith("?"):
                 text += "?"
-            addQuestion(text, journal['questions'])
+            question_exists = False # False or stored question
+            for question in journal['questions']:
+                if text.lower() == journal['questions'][question]['text'].lower():
+                    question_exists = question
+                    break
+            if not question_exists:
+                addQuestion(text, journal['questions'])
+            else:
+                del journal['questions'][question_exists]
+
+
     elif choice == 4000:
         page = "i"
         date = datetime.date.today()
@@ -164,14 +205,12 @@ while True:
                 date = date - datetime.timedelta(days=1)
             elif page == ">":
                 date = date + datetime.timedelta(days=1)
-            elif page == "*":
+            elif page == "f":
                 date_string = datetime.date.strftime(date, '%Y%m%d')
                 if not date_string in journal['favourites']:
                     journal['favourites'].append(date_string)
-                    cprint("+", 'green', attrs=['bold'])
                 else:
                     journal['favourites'].remove(date_string)
-                    cprint("-", 'red', attrs=['bold'])
             elif page == "":
                 break
             elif page.lower() == "i":
@@ -181,26 +220,35 @@ while True:
                     date = datetime.datetime.strptime(page, '%Y%m%d')
                 except ValueError:
                     cprint("Felaktigt datum, försök igen.",
-                            'red', attrs=['bold'], file=sys.stderr)
+                           'red', attrs=['bold'], file=sys.stderr)
             data = getEntries(journal['entries'], date)
-            cprint(data['date'].strftime('%A %d %B %Y'),
-                    'yellow', attrs=['bold'])
-            printSeparator()
+            # cprint(data['date'].strftime('%A %d %B %Y'),
+            #        'yellow', attrs=['bold'])
+            if data['favourite']:
+                heading_favourite = colored("*", 'yellow', attrs=['bold'])
+            else:
+                heading_favourite = colored("*", 'white', attrs=['dark'])
+            date_string = data['date'].strftime('%A %d %B %Y')
+            heading = (f"{colored(date_string, 'yellow', attrs=['bold'])} " + 
+                " " * (76 - len(date_string)) +
+                heading_favourite)
+            newScreen(heading)
+            if not len(data['entries']):
+                print(f"Svar saknas")
             for entry in data['entries']:
-                cprint(entry['question'], 'magenta', attrs=['bold'])
+                cprint(entry['question'], 'magenta')
                 print('\n'.join(textwrap.wrap(
                     entry['answer'], 80, break_long_words=False)))
-            if len(data['entries']) > 0:
-                printSeparator()
+            printSeparator()
             print((f"{colored('[<]', 'white', attrs=['bold'])} " +
-                    f"{colored('[>]', 'white', attrs=['bold'])} " +
-                    f"{colored('[yyyymmdd]', 'white', attrs=['bold'])} " +
-                    f"{colored('[i]', 'white', attrs=['bold'])} " +
-                    "Idag " +
-                    f"{colored('[*]', 'white', attrs=['bold'])} " +
-                    "Favorit " +
-                    f"{colored('[enter]', 'white', attrs=['bold'])} " +
-                    "Avsluta"))
+                   f"{colored('[>]', 'white', attrs=['bold'])} " +
+                   f"{colored('[yyyymmdd]', 'white', attrs=['bold'])} " +
+                   f"{colored('[i]', 'white', attrs=['bold'])} " +
+                   "Idag " +
+                   f"{colored('[f]', 'white', attrs=['bold'])} " +
+                   "Favorit " +
+                   f"{colored('[enter]', 'white', attrs=['bold'])} " +
+                   "Tillbaka"))
             # page = input(prompt)
             page = input_colorama(prompt)
 
@@ -211,8 +259,9 @@ with open(file_temp, "w", encoding='utf-8') as temp_file:
         json.dump(journal, temp_file, ensure_ascii=False)
         file_check = True
     except Exception as err:
-        print(
-            f"Kunde inte spara {colored(file_json, 'cyan', attrs=['underline'])}")
+        heading = f"Kunde inte spara {colored(file_json, 'cyan', attrs=['underline'])}"
+        newScreen(heading)
+        cprint("Avslutar", 'red', attrs=['bold'])
         saveError(err, file_err)
         sys.exit(1)
 
@@ -220,5 +269,6 @@ if file_check:
     os.remove(file_temp)
     with open(file_json, "w", encoding='utf-8') as journal_file:
         json.dump(journal, journal_file, ensure_ascii=False)
+        clearScreen()
     print(
         f"Journal sparad {colored(file_json, 'cyan', attrs=['underline'])}")
