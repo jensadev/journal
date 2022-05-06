@@ -1,0 +1,53 @@
+{
+    "sv": {
+        "ANSWER": "Svara",
+        "BACK": "Tillbaka",
+        "CREATING_JOURNAL_FILE": "Skapar journalfil",
+        "DATE": "Datum",
+        "EDIT": "Redigera",
+        "EDIT_WHAT": "Redigera %{what}",
+        "ERRORS": {
+            "CANNOT_CREATE_FILE": "Kan inte skapa fil",
+            "CANNOT_OPEN_FILE": "Kan inte öppna fil",
+            "CANNOT_WRITE_FILE": "Kan inte skriva fil",
+            "INCORRECT_TYPE_FORMAT": "Felaktigt %{type} format.",
+            "INCORRECT_TYPE_FORMAT_TRY_AGAIN": "Felaktigt %{type} format. Försök igen.",
+            "SAVING_ERROR_TO_FILE": "Sparar fel till fil",
+            "UNABLE_TO_LOAD_FILE": "Kan inte ladda fil",
+            "UNABLE_TO_SAVE_FILE": "Kan inte spara till fil",
+            "UNKNOWN_ERROR": "Okänt fel",
+            "WRONG_FORMAT_IN_FILE": "Felaktigt filformat",
+            "WRONG_INPUT": "Felaktig inmatning",
+            "WRONG_INPUT_TRY_AGAIN": "Felaktig inmatning. Försök igen."
+        },
+        "FAVOURITE": "Favorit",
+        "HISTORY": "Historik",
+        "LOADING_JOURNAL_FROM_FILE": "Laddar journal från fil",
+        "NO_ENTRIES": "Inga svar",
+        "QUESTION": {
+            "EDIT_NUMBER": {
+                "one": "Redigera fråga",
+                "other": "Redigera frågor"
+            },
+            "OR_EXISTING": "eller en existerande",
+            "QUESTION": "Fråga",
+            "TO_REMOVE": "för att ta bort",
+            "WRITE_NEW": "Skriv en ny"
+        },
+        "QUESTIONS": {
+            "1": {
+                "QUESTION": "Vad gjorde du igår?"
+            },
+            "2": {
+                "QUESTION": "Vad ska du göra idag?"
+            },
+            "3": {
+                "QUESTION": "Vad hindrar dina framsteg?"
+            }
+        },
+        "QUIT": "Avsluta",
+        "QUITTING": "Avslutar",
+        "SAVED_JOURNAL_TO_FILE": "Sparat journal till fil",
+        "SAVING_JOURNAL_TO_FILE": "Sparar journal till fil"
+    }
+}

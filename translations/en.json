@@ -1,0 +1,53 @@
+{
+    "en": {
+        "ANSWER": "Answer",
+        "BACK": "Back",
+        "CREATING_JOURNAL_FILE": "Creating journal file",
+        "DATE": "Date",
+        "EDIT": "Edit",
+        "EDIT_WHAT": "Edit %{what}",
+        "ERRORS": {
+            "CANNOT_CREATE_FILE": "Cannot create file",
+            "CANNOT_OPEN_FILE": "Cannot open file",
+            "CANNOT_WRITE_FILE": "Cannot write file",
+            "INCORRECT_TYPE_FORMAT": "Incorrect %{type} format.",
+            "INCORRECT_TYPE_FORMAT_TRY_AGAIN": "Incorrect %{type} format. Try again.",
+            "SAVING_ERROR_TO_FILE": "Saving error to file",
+            "UNABLE_TO_LOAD_FILE": "Unable to load file",
+            "UNABLE_TO_SAVE_FILE": "Unable to save file",
+            "UNKNOWN_ERROR": "Unknown error",
+            "WRONG_FORMAT_IN_FILE": "Wrong format in file",
+            "WRONG_INPUT": "Wrong input",
+            "WRONG_INPUT_TRY_AGAIN": "Wrong input. Try again."
+        },
+        "FAVOURITE": "Favourite",
+        "HISTORY": "History",
+        "LOADING_JOURNAL_FROM_FILE": "Loading journal from file",
+        "NO_ENTRIES": "No entries",
+        "QUESTION": {
+            "EDIT_NUMBER": {
+                "one": "Edit question",
+                "other": "Edit questions"
+            },
+            "OR_EXISTING": "or an existing",
+            "QUESTION": "Question",
+            "TO_REMOVE": "to remove",
+            "WRITE_NEW": "Write a new"
+        },
+        "QUESTIONS": {
+            "1": {
+                "QUESTION": "What did you do yesterday?"
+            },
+            "2": {
+                "QUESTION": "What will you do today?"
+            },
+            "3": {
+                "QUESTION": "Anything blocking your progress?"
+            }
+        },
+        "QUIT": "Quit",
+        "QUITTING": "Quitting",
+        "SAVED_JOURNAL_TO_FILE": "Saved journal to file",
+        "SAVING_JOURNAL_TO_FILE": "Saving journal to file"
+    }
+}
