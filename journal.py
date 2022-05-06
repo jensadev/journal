@@ -31,7 +31,8 @@ def printSeparator():
 
 
 def clearScreen():
-    print("\033c")
+    # print("\033c")
+    os.system('cls||clear')
 
 
 def newScreen(heading = False):
