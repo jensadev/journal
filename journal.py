@@ -146,9 +146,8 @@ except Exception as err:
     saveError(err, file_err)
     sys.exit(1)
 
-
+time.sleep(0.35)
 while True:
-    time.sleep(0.3)
     heading = colored("Journal", 'yellow', attrs=['bold'])
     newScreen(heading)
     mapped = {}
@@ -213,9 +212,11 @@ while True:
                 else:
                     journal['favourites'].remove(date_string)
             elif page == "":
-                break
-            elif page.lower() == "i":
-                date = datetime.date.today()
+                today = datetime.date.today()
+                if date == today:
+                    break
+                else:
+                    date = datetime.date.today()
             else:
                 try:
                     date = datetime.datetime.strptime(page, '%Y%m%d')
@@ -244,8 +245,6 @@ while True:
             print((f"{colored('[<]', 'white', attrs=['bold'])} " +
                    f"{colored('[>]', 'white', attrs=['bold'])} " +
                    f"{colored('[yyyymmdd]', 'white', attrs=['bold'])} " +
-                   f"{colored('[i]', 'white', attrs=['bold'])} " +
-                   "Idag " +
                    f"{colored('[f]', 'white', attrs=['bold'])} " +
                    "Favorit " +
                    f"{colored('[enter]', 'white', attrs=['bold'])} " +
