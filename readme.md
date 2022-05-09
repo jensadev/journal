@@ -12,4 +12,6 @@ Requires python3. Tested on windows and linux.
 
 Run with `python journal.py` or build your own exe.
 
-
+```
+pyinstaller -F --add-data "translations/en.json;." --add-data "translations/sv.json;." .\journal.py
+```
