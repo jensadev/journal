@@ -14,8 +14,15 @@ from i18n import resource_loader
 from i18n.translator import t
 from i18n import config
 
-TRANSLATION_FOLDER = os.path.dirname(
-    __file__) + os.sep + "translations" + os.sep
+def resource_path(relative_path):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path, 'translations')
+
+
+relative_path = os.path.join(os.path.dirname(__file__))
+
+TRANSLATION_FOLDER = resource_path(relative_path)
 resource_loader.init_loaders()
 config.set('load_path', [TRANSLATION_FOLDER])
 config.set("file_format", "json")
