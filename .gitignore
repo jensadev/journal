@@ -1,5 +1,5 @@
 journal.json
+.journal/
 build/
 dist/
-program.spec
-journal.spec
+*.spec

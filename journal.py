@@ -14,6 +14,7 @@ from i18n import resource_loader
 from i18n.translator import t
 from i18n import config
 
+
 def resource_path(relative_path):
     if hasattr(sys, '_MEIPASS'):
         return os.path.join(sys._MEIPASS, relative_path)
@@ -118,12 +119,12 @@ def getMainChoice():
 
 
 def saveError(error, file):
-    #    print(f"Skriver fel till {colored(file , 'red', attrs=['underline'])}")
     print(
         f"{t('SAVING_ERROR_TO_FILE')} {colored(file , 'red', attrs=['underline'])}")
     with open(file, "a+", encoding='utf-8') as err_file:
         print(f"[{datetime.datetime.now().strftime('%c')}] {err}", file=err_file)
-#######################
+
+################################################################################
 
 
 questions = {}
