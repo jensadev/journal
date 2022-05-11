@@ -124,6 +124,18 @@ def saveError(error, file):
     with open(file, "a+", encoding='utf-8') as err_file:
         print(f"[{datetime.datetime.now().strftime('%c')}] {err}", file=err_file)
 
+def printQuestions(i_text = True, map = False):
+    mapped = {}
+    for index, question in enumerate(journal['questions']):
+        index_text = ''
+        if i_text:
+            index_text = colored(f"[{index + 1}] ", 'white', attrs=['bold'])
+
+        print(index_text + f"{colored(journal['questions'][question]['text'], 'magenta')}")
+        if map:
+            mapped[index + 1] = journal['questions'][question]['id']
+    return mapped
+
 ################################################################################
 
 
@@ -188,12 +200,7 @@ TITLE_HEADING = colored("Journal", 'yellow', attrs=['bold'])
 
 while True:
     newScreen(TITLE_HEADING)
-    mapped = {}
-    for index, question in enumerate(journal['questions']):
-        index_text = f"[{index + 1}] "
-        print((f"{colored(index_text, 'white', attrs=['bold'])}" +
-               f"{colored(journal['questions'][question]['text'], 'magenta')}"))
-        mapped[index + 1] = journal['questions'][question]['id']
+    mapped = printQuestions(map=True)
     choice = getMainChoice()
     if choice in mapped:
         newScreen(colored(t('ANSWER'), 'yellow', attrs=['bold']))
@@ -215,6 +222,7 @@ while True:
         heading = colored(t('QUESTION.EDIT_NUMBER', count=1),
                           'yellow', attrs=['bold'])
         newScreen(heading)
+        printQuestions(False)
         print((f"{colored('[enter]', 'white', attrs=['bold'])}" +
                f" {t('QUESTION.WRITE_NEW')} " +
                f"{colored(t('QUESTION.QUESTION').lower(), 'magenta')}" +
@@ -276,9 +284,10 @@ while True:
             if not len(data['entries']):
                 print(t('NO_ENTRIES'))
             for entry in data['entries']:
-                cprint(entry['question'], 'magenta')
-                print('\n'.join(textwrap.wrap(
-                    entry['answer'], 80, break_long_words=False)))
+                if entry['answer']:
+                    cprint(entry['question'], 'magenta')
+                    print('\n'.join(textwrap.wrap(
+                        entry['answer'], 80, break_long_words=False)))
             printSeparator()
 
             print((f"{colored('[<]', 'white', attrs=['bold'])} " +
