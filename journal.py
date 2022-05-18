@@ -10,6 +10,7 @@ import os
 import os.path
 import time
 import locale
+import re
 from i18n import resource_loader
 from i18n.translator import t
 from i18n import config
@@ -135,6 +136,19 @@ def printQuestions(i_text = True, map = False):
         if map:
             mapped[index + 1] = journal['questions'][question]['id']
     return mapped
+
+def formatLink(uri, label=None):
+    if label is None: 
+        label = uri
+    parameters = ''
+
+    # OSC 8 ; params ; URI ST <name> OSC 8 ;; ST 
+    escape_mask = '\033]8;{};{}\033\\{}\033]8;;\033\\'
+
+    return escape_mask.format(parameters, uri, label)
+
+def getLinks(text):
+    return re.findall(r'(https?://[^\s]+)', text)
 
 ################################################################################
 
@@ -275,7 +289,7 @@ while True:
             if data['favourite']:
                 heading_favourite = colored("*", 'yellow', attrs=['bold'])
             else:
-                heading_favourite = colored("*", 'white', attrs=['dark'])
+                heading_favourite = colored("*", 'grey')
             date_string = data['date'].strftime('%A %d %B %Y')
             heading = (f"{colored(date_string, 'yellow', attrs=['bold'])} " +
                        " " * (76 - len(date_string)) +
@@ -286,6 +300,10 @@ while True:
             for entry in data['entries']:
                 if entry['answer']:
                     cprint(entry['question'], 'magenta')
+                    text = entry['answer']
+                    for link in getLinks(entry['answer']):
+                        formattedLink = formatLink(link)
+                        text = text.replace(link, formattedLink)
                     print('\n'.join(textwrap.wrap(
                         entry['answer'], 80, break_long_words=False)))
             printSeparator()
