@@ -1,19 +1,18 @@
-import sys
-from pathlib import Path
-from termcolor import colored, cprint
-import colorama
-import json
-import hashlib
 import datetime
-import textwrap
-import os
-import os.path
-import time
+from hashlib import md5
+import json
 import locale
-import re
-from i18n import resource_loader
+import os
+from re import findall
+import sys
+import textwrap
+from time import sleep
+from pathlib import Path
+
+from colorama import init as cinit
+from i18n import config, resource_loader
 from i18n.translator import t
-from i18n import config
+from termcolor import colored, cprint
 
 
 def resource_path(relative_path):
@@ -39,7 +38,7 @@ if loc == 'sv_SE':
 
 resource_loader.init_json_loader()
 
-colorama.init(autoreset=True)
+cinit(autoreset=True)
 
 SLEEP_TIME = 0.35
 
@@ -50,7 +49,7 @@ def input_colorama(message):
 
 
 def addQuestion(text, object):
-    hash = hashlib.md5(text.encode('utf-8')).hexdigest()
+    hash = md5(text.encode('utf-8')).hexdigest()
     today = datetime.date.strftime(datetime.date.today(), '%Y%m%d')
     object[hash] = {
         "id": hash,
@@ -125,30 +124,34 @@ def saveError(error, file):
     with open(file, "a+", encoding='utf-8') as err_file:
         print(f"[{datetime.datetime.now().strftime('%c')}] {err}", file=err_file)
 
-def printQuestions(i_text = True, map = False):
+
+def printQuestions(i_text=True, map=False):
     mapped = {}
     for index, question in enumerate(journal['questions']):
         index_text = ''
         if i_text:
             index_text = colored(f"[{index + 1}] ", 'white', attrs=['bold'])
 
-        print(index_text + f"{colored(journal['questions'][question]['text'], 'magenta')}")
+        print(index_text +
+              f"{colored(journal['questions'][question]['text'], 'magenta')}")
         if map:
             mapped[index + 1] = journal['questions'][question]['id']
     return mapped
 
+
 def formatLink(uri, label=None):
-    if label is None: 
+    if label is None:
         label = uri
     parameters = ''
 
-    # OSC 8 ; params ; URI ST <name> OSC 8 ;; ST 
+    # OSC 8 ; params ; URI ST <name> OSC 8 ;; ST
     escape_mask = '\033]8;{};{}\033\\{}\033]8;;\033\\'
 
     return escape_mask.format(parameters, uri, label)
 
+
 def getLinks(text):
-    return re.findall(r'(https?://[^\s]+)', text)
+    return findall(r'(https?://[^\s]+)', text)
 
 ################################################################################
 
@@ -208,7 +211,7 @@ except Exception as err:
     saveError(err, file_err)
     sys.exit(1)
 
-time.sleep(SLEEP_TIME)
+sleep(SLEEP_TIME)
 
 TITLE_HEADING = colored("Journal", 'yellow', attrs=['bold'])
 
@@ -284,7 +287,7 @@ while True:
                 except ValueError:
                     cprint(t('ERRORS.INCORRECT_TYPE_FORMAT_TRY_AGAIN', type=t('DATE').lower()),
                            'red', attrs=['bold'], file=sys.stderr)
-                    time.sleep(SLEEP_TIME)
+                    sleep(SLEEP_TIME)
             data = getEntries(journal['entries'], date)
             if data['favourite']:
                 heading_favourite = colored("*", 'yellow', attrs=['bold'])
